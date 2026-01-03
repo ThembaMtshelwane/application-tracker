@@ -1,6 +1,7 @@
 import { type NextFunction, type Request, type Response } from "express";
 import { ERROR_MESSAGES, HTTP_CODES } from "../consts/http.consts.js";
 import ENV_VARS from "../consts/env.consts.js";
+import { ZodError } from "zod";
 
 class HttpError extends Error {
   statusCode: number;
@@ -10,6 +11,21 @@ class HttpError extends Error {
   }
 }
 
+const handleZodError = (err: ZodError) => {
+  const errors = err.issues.map((issue) => ({
+    path: issue.path.join("."),
+    message: issue.message,
+  }));
+
+  return {
+    statusCode: HTTP_CODES.BAD_REQUEST,
+    body: {
+      errors,
+      message: "Validation Error",
+    },
+  };
+};
+
 export const notFound = (req: Request, res: Response, next: NextFunction) => {
   res
     .status(HTTP_CODES.NOT_FOUND)
@@ -17,7 +33,7 @@ export const notFound = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const errorHandler = (
-  err: unknown | HttpError,
+  err: unknown | HttpError | ZodError,
   _: Request,
   res: Response
 ) => {
@@ -26,6 +42,11 @@ export const errorHandler = (
       message: err.message,
       stack: ENV_VARS.NODE_ENV === "production" ? undefined : err.stack,
     });
+  }
+
+  if (err instanceof ZodError) {
+    const { statusCode, body } = handleZodError(err);
+    return res.status(statusCode).json(body);
   }
 
   res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
