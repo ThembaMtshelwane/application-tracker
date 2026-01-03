@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    /* --- File Layout --- */
+    "rootDir": "./src" /* Specifies the root folder of source files */,
+    "outDir": "./dist" /* Redirects output structure to the 'dist' directory */,
+
+    /* --- Environment Settings --- */
+    "module": "nodenext" /* Specifies the module code generation for Node.js */,
+    "target": "esnext" /* Specifies the version of JavaScript to output */,
+    "types": ["node"] /* Explicitly include Node.js type definitions */,
+    "lib": [
+      "esnext"
+    ] /* Specifies library files to be included in the compilation */,
+
+    /* --- Other Outputs --- */
+    "sourceMap": true /* Generates corresponding '.map' file for debugging */,
+    "declaration": true /* Generates corresponding '.d.ts' file for library usage */,
+    "declarationMap": true /* Creates a map for your declaration files */,
+
+    /* --- Stricter Typechecking Options --- */
+    "noUncheckedIndexedAccess": true /* Adds 'undefined' to any index-based access (e.g., arrays) */,
+    "exactOptionalPropertyTypes": true /* Prevents setting optional properties to 'undefined' */,
+    "strict": true /* Enables all strict type-checking options */,
+
+    /* --- Performance & Compatibility --- */
+    "verbatimModuleSyntax": true /* Ensures imports are consistent and easier to optimize */,
+    "isolatedModules": true /* Ensures each file can be safely transpiled independently */,
+    "noUncheckedSideEffectImports": true /* Checks if side-effect imports (e.g., import './init') exist */,
+    "moduleDetection": "force" /* Treats all files as modules to prevent global scope errors */,
+    "skipLibCheck": true /* Skip type checking of declaration files (.d.ts) */,
+    "esModuleInterop": true /* Allows 'import x from y' for CommonJS modules like Express */,
+    "forceConsistentCasingInFileNames": true /* Ensures that imports match the disk's file casing */
+  },
+  "include": [
+    "src/**/*"
+  ] /* Tells TS to only compile files inside the src folder */,
+  "exclude": [
+    "node_modules",
+    "dist"
+  ] /* Prevents TS from looking into these folders */
+}
