@@ -3,7 +3,7 @@ import { ERROR_MESSAGES, HTTP_CODES } from "../consts/http.consts.js";
 import ENV_VARS from "../consts/env.consts.js";
 import { ZodError } from "zod";
 
-class HttpError extends Error {
+export class HttpError extends Error {
   statusCode: number;
   constructor(statusCode: number, message: string) {
     super(message);
