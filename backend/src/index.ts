@@ -1,9 +1,11 @@
 import type { Application } from "express";
 import { createApp } from "./app.js";
 import ENV_VARS from "./consts/env.consts.js";
+import { connectDatabase, disconnectDatabase } from "./config/database.js";
 
 const startServer = async () => {
   try {
+    await connectDatabase(ENV_VARS.MONGO_URI);
     const app: Application = createApp();
 
     const server = app.listen(ENV_VARS.PORT, () => {
@@ -15,6 +17,7 @@ const startServer = async () => {
       console.log(`\n⚡ Received ${signal}. Shutting down gracefully...`);
       server.close(async () => {
         console.log("🔒 HTTP server closed");
+        await disconnectDatabase();
         process.exit(0);
       });
 
