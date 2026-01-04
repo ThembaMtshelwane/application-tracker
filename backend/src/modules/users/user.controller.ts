@@ -36,3 +36,13 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
 
   sendResponse(res, HTTP_CODES.OK, "Successfully fetched users", users);
 });
+
+export const updateUser = asyncHandler(async (req: Request, res: Response) => {
+  const updateUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+    timestamps: true,
+  }).select("-password -jwt_secret -access_token_secret -refresh_token_secret");
+
+  sendResponse(res, HTTP_CODES.OK, "Successfully updated the user", updateUser);
+});
