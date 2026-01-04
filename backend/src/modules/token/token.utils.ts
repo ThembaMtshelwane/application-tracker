@@ -27,7 +27,7 @@ export const validateTokenPayload = (payload: TokenPayload): void => {
     throw new HttpError(HTTP_CODES.UNAUTHORIZED, "Invalid token structure");
   }
 
-  if (!payload.tokenVersion || typeof payload.tokenVersion !== "number") {
-    throw new HttpError(HTTP_CODES.UNAUTHORIZED, "Invalid token structure");
-  }
+  // if (!payload.tokenVersion || typeof payload.tokenVersion !== "number") {
+  //   throw new HttpError(HTTP_CODES.UNAUTHORIZED, "Invalid token structure");
+  // }
 };

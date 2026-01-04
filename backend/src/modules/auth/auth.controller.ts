@@ -11,7 +11,11 @@ import {
 } from "../../utils/cookie.js";
 import { verifyToken } from "../token/token.service.js";
 import ENV_VARS from "../../consts/env.consts.js";
+import { sendResponse } from "../../utils/http.success.js";
 
+// ────────────────────────────────────────────────
+// REGISTER USER
+// ────────────────────────────────────────────────
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { firstName, lastName, email, password } = req.body;
 
@@ -42,9 +46,14 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     .json({ message: "User registered successfully" });
 });
 
+// ────────────────────────────────────────────────
+// LOGIN USER
+// ────────────────────────────────────────────────
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select(
+    "+tokenVersion +access_token_secret +refresh_token_secret "
+  );
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
     throw new HttpError(HTTP_CODES.BAD_REQUEST, "Invalid credentials");
@@ -65,10 +74,21 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       role: user.role,
     },
   });
+
+  sendResponse(res, HTTP_CODES.OK, "Successfully logged in", {
+    user: {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+  });
 });
 
+// ────────────────────────────────────────────────
+// REFRESH ACCESS TOKEN
+// ────────────────────────────────────────────────
 export const refresh = asyncHandler(
-  async (req: Request, _: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
       throw new HttpError(HTTP_CODES.UNAUTHORIZED, "Session expired");
@@ -79,13 +99,32 @@ export const refresh = asyncHandler(
       globalSecret: ENV_VARS.GLOBAL_REFRESH_SECRET,
     });
 
-    req.user = user;
-    next();
+    // Token Rotation: Generate new token pair
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    await user.save();
+
+    // Set new tokens in cookies
+    res.cookie("refreshToken", newRefreshToken, REFRESH_COOKIE_OPTIONS);
+    res.cookie("accessToken", newAccessToken, ACCESS_COOKIE_OPTIONS);
+
+    sendResponse(res, HTTP_CODES.OK, "Token refreshed successfully");
   }
 );
+
+// ────────────────────────────────────────────────
+// GET LOGGIED IN USER
+// ────────────────────────────────────────────────
+export const profile = asyncHandler(async (req: Request, res: Response) => {
+  const user = await User.findById(req.user.id);
+  if (!user) throw new HttpError(HTTP_CODES.NOT_FOUND, "User not found");
+
+  sendResponse(res, HTTP_CODES.OK, "Logged in user successfully fetched");
+});
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
   res.clearCookie("accessToken", ACCESS_COOKIE_OPTIONS);
   res.clearCookie("refreshToken", REFRESH_COOKIE_OPTIONS);
-  res.status(200).json({ message: "User logged out successfully" });
+  sendResponse(res, HTTP_CODES.OK, "User logged out successfully");
 });

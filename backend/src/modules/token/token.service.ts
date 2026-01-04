@@ -26,7 +26,7 @@ export const verifyToken = async (
 
   // Step 3: Fetch user with secrets from database
   const user = await User.findById(payload.id).select(
-    "+jwt_secret +tokenVersion -password"
+    "+access_token_secret +refresh_token_secret +tokenVersion"
   );
 
   if (!user || !user[config.userSecretField]) {
@@ -41,10 +41,10 @@ export const verifyToken = async (
     verified = jwt.verify(token, combinedSecret) as TokenPayload;
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      throw new HttpError(HTTP_CODES.UNAUTHORIZED, "Token expired");
+      throw new HttpError(HTTP_CODES.UNAUTHORIZED, error.message);
     }
     if (error instanceof jwt.JsonWebTokenError) {
-      throw new HttpError(HTTP_CODES.UNAUTHORIZED, "Invalid token");
+      throw new HttpError(HTTP_CODES.UNAUTHORIZED, error.message);
     }
     throw error;
   }

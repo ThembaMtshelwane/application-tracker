@@ -39,7 +39,7 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   if (err instanceof HttpError) {
-    res.status(err.statusCode).json({
+    return res.status(err.statusCode).json({
       message: err.message,
       stack: ENV_VARS.NODE_ENV === "production" ? undefined : err.stack,
     });
@@ -47,10 +47,10 @@ export const errorHandler = (
 
   if (err instanceof ZodError) {
     const { statusCode, body } = handleZodError(err);
-    res.status(statusCode).json(body);
+    return res.status(statusCode).json(body);
   }
 
-  res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
+  return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
     message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
     stack:
       ENV_VARS.NODE_ENV === "production"
