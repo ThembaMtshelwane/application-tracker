@@ -104,16 +104,6 @@ export const refresh = asyncHandler(
   }
 );
 
-// ────────────────────────────────────────────────
-// GET LOGGIED IN USER
-// ────────────────────────────────────────────────
-export const profile = asyncHandler(async (req: Request, res: Response) => {
-  const user = await User.findById(req.user.id);
-  if (!user) throw new HttpError(HTTP_CODES.NOT_FOUND, "User not found");
-
-  sendResponse(res, HTTP_CODES.OK, "Logged in user successfully fetched");
-});
-
 export const logout = asyncHandler(async (req: Request, res: Response) => {
   res.clearCookie("accessToken", ACCESS_COOKIE_OPTIONS);
   res.clearCookie("refreshToken", REFRESH_COOKIE_OPTIONS);
