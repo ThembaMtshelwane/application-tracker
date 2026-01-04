@@ -4,6 +4,7 @@ import User from "./user.model.js";
 import { HttpError } from "../../middleware/error.middleware.js";
 import { HTTP_CODES } from "../../consts/http.consts.js";
 import { sendResponse } from "../../utils/http.success.js";
+import { paginate } from "../../shared/services/paginate.js";
 
 // ────────────────────────────────────────────────
 // GET LOGGIED IN USER
@@ -23,4 +24,15 @@ export const getUser = asyncHandler(async (req: Request, res: Response) => {
   if (!user) throw new HttpError(HTTP_CODES.NOT_FOUND, "User not found");
 
   sendResponse(res, HTTP_CODES.OK, "Successfully feteched user", user);
+});
+
+export const getUsers = asyncHandler(async (req: Request, res: Response) => {
+  const users = await paginate(User, req.query, {
+    searchFields: ["firstName", "lastName", "email"],
+    filterableFields: ["role"],
+    selectFields:
+      "-password -jwt_secret -access_token_secret -refresh_token_secret",
+  });
+
+  sendResponse(res, HTTP_CODES.OK, "Successfully fetched users", users);
 });
