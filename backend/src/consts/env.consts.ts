@@ -9,6 +9,8 @@ const ENV_VARS = {
     process.env.MONGO_URI ?? "mongodb://localhost:27017/application-tracker",
   GLOBAL_ACCESS_SECRET:
     process.env.GLOBAL_ACCESS_SECRET ?? crypto.randomBytes(32).toString("hex"),
+  GLOBAL_REFRESH_SECRET:
+    process.env.GLOBAL_REFRESH_SECRET ?? crypto.randomBytes(32).toString("hex"),
 };
 
 export default ENV_VARS;

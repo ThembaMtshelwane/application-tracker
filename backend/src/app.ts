@@ -1,6 +1,7 @@
 import express, { type Application } from "express";
 import { corsMiddleware } from "./middleware/cors.middleware.js";
 import { errorHandler, notFound } from "./middleware/error.middleware.js";
+import routes from "./router/index.js";
 
 export const createApp = () => {
   const app: Application = express();
@@ -8,6 +9,8 @@ export const createApp = () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(corsMiddleware);
+
+  app.use("/api", routes);
 
   app.use(notFound);
   app.use(errorHandler);
