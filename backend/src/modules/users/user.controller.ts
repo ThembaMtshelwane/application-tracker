@@ -46,3 +46,14 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 
   sendResponse(res, HTTP_CODES.OK, "Successfully updated the user", updateUser);
 });
+
+export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
+  const deletedUser = await User.findByIdAndDelete(req.params.id);
+  if (!deletedUser)
+    throw new HttpError(
+      HTTP_CODES.INTERNAL_SERVER_ERROR,
+      "Failed to delete user"
+    );
+
+  sendResponse(res, HTTP_CODES.OK, "Successfully deleted a user");
+});
