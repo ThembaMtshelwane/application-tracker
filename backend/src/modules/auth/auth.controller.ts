@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import { type Request, type Response } from "express";
+import { type NextFunction, type Request, type Response } from "express";
 import User from "../users/user.model.js";
 import { HttpError } from "../../middleware/error.middleware.js";
 import { HTTP_CODES } from "../../consts/http.consts.js";
@@ -9,9 +9,11 @@ import {
   ACCESS_COOKIE_OPTIONS,
   REFRESH_COOKIE_OPTIONS,
 } from "../../utils/cookie.js";
+import { verifyToken } from "../token/token.service.js";
+import ENV_VARS from "../../consts/env.consts.js";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const {firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   // 1. Check if user exists
   const existingUser = await User.findOne({ email });
@@ -22,7 +24,12 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const hashedPassword = await bcrypt.hash(password, 12);
 
   // 3. Create User
-  const user = await User.create({firstName, lastName, email, password: hashedPassword });
+  const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
+  });
 
   if (!user)
     throw new HttpError(
@@ -58,4 +65,27 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       role: user.role,
     },
   });
+});
+
+export const refresh = asyncHandler(
+  async (req: Request, _: Response, next: NextFunction) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new HttpError(HTTP_CODES.UNAUTHORIZED, "Session expired");
+    }
+
+    const user = await verifyToken(refreshToken, {
+      userSecretField: "refresh_token_secret",
+      globalSecret: ENV_VARS.GLOBAL_REFRESH_SECRET,
+    });
+
+    req.user = user;
+    next();
+  }
+);
+
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  res.clearCookie("accessToken", ACCESS_COOKIE_OPTIONS);
+  res.clearCookie("refreshToken", REFRESH_COOKIE_OPTIONS);
+  res.status(200).json({ message: "User logged out successfully" });
 });
