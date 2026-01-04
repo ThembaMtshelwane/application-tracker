@@ -11,7 +11,7 @@ import {
 } from "../../utils/cookie.js";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const {firstName, lastName, email, password } = req.body;
 
   // 1. Check if user exists
   const existingUser = await User.findOne({ email });
@@ -22,7 +22,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const hashedPassword = await bcrypt.hash(password, 12);
 
   // 3. Create User
-  const user = await User.create({ email, password: hashedPassword });
+  const user = await User.create({firstName, lastName, email, password: hashedPassword });
 
   if (!user)
     throw new HttpError(
