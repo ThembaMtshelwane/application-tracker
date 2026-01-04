@@ -66,15 +66,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
   res.cookie("accessToken", accessToken, ACCESS_COOKIE_OPTIONS);
 
-  res.status(HTTP_CODES.OK).json({
-    message: "Successfully logged in",
-    user: {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-    },
-  });
-
   sendResponse(res, HTTP_CODES.OK, "Successfully logged in", {
     user: {
       id: user._id,
