@@ -12,10 +12,10 @@ import { deleteOneDoc } from "../../shared/crudHandler.js";
 // ────────────────────────────────────────────────
 export const profile = asyncHandler(async (req: Request, res: Response) => {
   const id = req.user.id;
-  const user = await User.findById(id);
+  const user = await User.findById(id).select("-password");
   if (!user) throw new HttpError(HTTP_CODES.NOT_FOUND, "User not found");
 
-  sendResponse(res, HTTP_CODES.OK, "Logged in user successfully fetched");
+  sendResponse(res, HTTP_CODES.OK, "Successfully fetched logged in user", user);
 });
 
 export const getUser = asyncHandler(async (req: Request, res: Response) => {
@@ -31,8 +31,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await paginate(User, req.query, {
     searchFields: ["firstName", "lastName", "email"],
     filterableFields: ["role"],
-    selectFields:
-      "-password -access_token_secret -refresh_token_secret",
+    selectFields: "-password -access_token_secret -refresh_token_secret",
   });
 
   sendResponse(res, HTTP_CODES.OK, "Successfully fetched users", users);
