@@ -14,7 +14,7 @@ export const authenticate = asyncHandler(
     }
     const user = await verifyToken(accessToken, {
       userSecretField: "access_token_secret",
-      globalSecret: ENV_VARS.GLOBAL_ACCESS_SECRET,
+      globalSecret: ENV_VARS.GLOBAL_ACCESS_SECRET as string,
     });
     req.user = user;
     next();

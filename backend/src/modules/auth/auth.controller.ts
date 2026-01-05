@@ -18,7 +18,7 @@ import crypto from "crypto";
 // REGISTER USER
 // ────────────────────────────────────────────────
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, role } = req.body;
 
   // 1. Check if user exists
   const existingUser = await User.findOne({ email });
@@ -33,6 +33,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     firstName,
     lastName,
     email,
+    role,
     password: hashedPassword,
     access_token_secret: crypto.randomBytes(32).toString("hex"),
     refresh_token_secret: crypto.randomBytes(32).toString("hex"),
@@ -91,7 +92,7 @@ export const refresh = asyncHandler(
 
     const user = await verifyToken(refreshToken, {
       userSecretField: "refresh_token_secret",
-      globalSecret: ENV_VARS.GLOBAL_REFRESH_SECRET,
+      globalSecret: ENV_VARS.GLOBAL_REFRESH_SECRET as string,
     });
 
     // Token Rotation: Generate new token pair
