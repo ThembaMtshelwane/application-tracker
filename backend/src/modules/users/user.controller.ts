@@ -44,7 +44,40 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
     timestamps: true,
   }).select("-access_token_secret -refresh_token_secret");
 
+  if (!updateUser)
+    throw new HttpError(
+      HTTP_CODES.INTERNAL_SERVER_ERROR,
+      "Failed to update user"
+    );
+
   sendResponse(res, HTTP_CODES.OK, "Successfully updated the user", updateUser);
 });
+
+export const updateUserStatus = asyncHandler(
+  async (req: Request, res: Response) => {
+    const updateUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { status: false },
+      {
+        new: true,
+        runValidators: true,
+        timestamps: true,
+      }
+    ).select("-access_token_secret -refresh_token_secret");
+
+    if (!updateUser)
+      throw new HttpError(
+        HTTP_CODES.INTERNAL_SERVER_ERROR,
+        "Failed to update user status"
+      );
+
+    sendResponse(
+      res,
+      HTTP_CODES.OK,
+      "Successfully updated the user role",
+      updateUser
+    );
+  }
+);
 
 export const deleteUser = deleteOneDoc(User);

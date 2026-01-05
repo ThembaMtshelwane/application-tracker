@@ -13,6 +13,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: UserRole;
+  status: boolean;
   access_token_secret: string;
   refresh_token_secret: string;
   tokenVersion: number;

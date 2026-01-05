@@ -5,13 +5,15 @@ import {
   profile,
   updateUser,
   deleteUser,
+  updateUserStatus,
 } from "./user.controller.js";
 import { authorize } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.get("/profile", profile);
 router.get("/", authorize(["admin"]), getUsers);
+router.get("/profile", profile);
+router.patch("/status/:id", authorize(["admin"]), updateUserStatus);
 router
   .route("/:id")
   .get(getUser)

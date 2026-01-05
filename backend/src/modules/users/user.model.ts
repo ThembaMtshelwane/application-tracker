@@ -12,6 +12,7 @@ const userSchema = new Schema<IUser>({
     enum: Object.values(USER_ROLES),
     default: USER_ROLES.USER,
   },
+  status: { type: Boolean, default: true },
   access_token_secret: {
     type: String,
     required: true,
