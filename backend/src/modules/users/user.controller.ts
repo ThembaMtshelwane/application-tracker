@@ -5,6 +5,7 @@ import { HttpError } from "../../middleware/error.middleware.js";
 import { HTTP_CODES } from "../../consts/http.consts.js";
 import { sendResponse } from "../../utils/http.success.js";
 import { paginate } from "../../shared/services/paginate.js";
+import { deleteOneDoc } from "../../shared/crudHandler.js";
 
 // ────────────────────────────────────────────────
 // GET LOGGIED IN USER
@@ -31,7 +32,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
     searchFields: ["firstName", "lastName", "email"],
     filterableFields: ["role"],
     selectFields:
-      "-password -jwt_secret -access_token_secret -refresh_token_secret",
+      "-password -access_token_secret -refresh_token_secret",
   });
 
   sendResponse(res, HTTP_CODES.OK, "Successfully fetched users", users);
@@ -42,18 +43,9 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
     new: true,
     runValidators: true,
     timestamps: true,
-  }).select("-password -jwt_secret -access_token_secret -refresh_token_secret");
+  }).select("-access_token_secret -refresh_token_secret");
 
   sendResponse(res, HTTP_CODES.OK, "Successfully updated the user", updateUser);
 });
 
-export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const deletedUser = await User.findByIdAndDelete(req.params.id);
-  if (!deletedUser)
-    throw new HttpError(
-      HTTP_CODES.INTERNAL_SERVER_ERROR,
-      "Failed to delete user"
-    );
-
-  sendResponse(res, HTTP_CODES.OK, "Successfully deleted a user");
-});
+export const deleteUser = deleteOneDoc(User);
