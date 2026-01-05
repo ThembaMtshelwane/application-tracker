@@ -1,13 +1,17 @@
 import { Schema, Model, model } from "mongoose";
 import crypto from "crypto";
-import type { IUser } from "./user.types.js";
+import { USER_ROLES, type IUser } from "./user.types.js";
 
 const userSchema = new Schema<IUser>({
-  firstName: {type: String, required:true},
-  lastName: {type: String, required:true},
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["user", "admin"], default: "user" },
+  role: {
+    type: String,
+    enum: Object.values(USER_ROLES),
+    default: USER_ROLES.USER,
+  },
   access_token_secret: {
     type: String,
     required: true,
