@@ -12,6 +12,7 @@ import {
 import { verifyToken } from "../token/token.service.js";
 import ENV_VARS from "../../consts/env.consts.js";
 import { sendResponse } from "../../utils/http.success.js";
+import crypto from "crypto";
 
 // ────────────────────────────────────────────────
 // REGISTER USER
@@ -33,6 +34,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     lastName,
     email,
     password: hashedPassword,
+    access_token_secret: crypto.randomBytes(32).toString("hex"),
+    refresh_token_secret: crypto.randomBytes(32).toString("hex"),
+    tokenVersion: 0,
   });
 
   if (!user)

@@ -17,13 +17,11 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
     select: false,
-    default: () => crypto.randomBytes(32).toString("hex"),
   },
   refresh_token_secret: {
     type: String,
     required: true,
     select: false,
-    default: () => crypto.randomBytes(32).toString("hex"),
   },
   tokenVersion: {
     type: Number,
